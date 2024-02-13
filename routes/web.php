@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,18 +16,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes();
 
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/categoria/{categoria}', [CategoriaController::class, 'show']);
-Route::get('/cadastroCategoria', [CategoriaController::class, 'create']);
+Route::get('/cadastroCategoria', [CategoriaController::class, 'create'])->name('telaCadastroCategoria');
 Route::post('/cadastroCategoria', [CategoriaController::class, 'store'])->name('cadastroCategoria');
 
-Route::get('/produto/{produto}', [ProdutoController::class, 'show']);
-Route::get('/cadastroProduto', [ProdutoController::class, 'create']);
+Route::get('/produtos', [ProdutoController::class, 'index'])->name('produtos');
+Route::get('/consultaProdutos/{nome?}/{categoria?}/{marca?}/{cor?}/{preco_minimo?}/{preco_maximo?}/{peso_minimo?}/{peso_maximo?}', [ProdutoController::class, 'consulta'])->name('consultaProdutos');
+Route::get('/produto/{produto}', [ProdutoController::class, 'show'])->name('visualizarProduto');
+Route::get('/cadastroProduto', [ProdutoController::class, 'create'])->name('telaCadastroProduto');
 Route::post('/cadastroProduto', [ProdutoController::class, 'store'])->name('cadastroProduto');
+
+Route::get('/cadastroPromocao', [CategoriaController::class, 'create'])->name('telaCadastroPromocao');;
+
+Route::put('/adicionarAoCarrinho', function(Request $request) {
+    return redirect()->back()->with('adicionado', true);
+})->name('adicionarAoCarrinho');

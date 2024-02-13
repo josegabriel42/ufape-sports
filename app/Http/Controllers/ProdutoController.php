@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Categoria;
 use App\Models\Produto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
@@ -26,7 +27,59 @@ class ProdutoController extends Controller
      */
     public function index()
     {
+        return view('produto.consultar', [
+            'produtos' => Produto::all(),
+            'categorias' => Categoria::all(),
+        ]);
+    }
+
+    /**
+     * Mostra um listagem dos produtos que correspondem à consulta.
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function consulta(Request $request)
+    {
+        $nome = $request['nome'];
+        $categoria = $request['categoria'];
+        $marca = $request['marca'];
+        $cor = $request['cor'];
+        $preco_minimo = $request['preco_minimo'];
+        $preco_maximo = $request['preco_maximo'];
+        $peso_minimo = $request['peso_minimo'];
+        $peso_maximo = $request['peso_maximo'];
+
+        $busca = DB::table('produtos');
+
+        if ($nome)
+            $busca = $busca->where('nome', 'like', '%'.$nome.'%');
         
+        if ($categoria)
+            $busca = $busca->where('categoria_id', $categoria);
+        
+        if ($marca)
+            $busca = $busca->where('nome', 'like', '%'.$marca.'%');
+
+        if (!is_null($preco_minimo) && !is_null($preco_maximo)) {
+            $busca = $busca->whereBetween('preco', [$preco_minimo, $preco_maximo]);
+        }elseif (!is_null($preco_minimo)) {
+            $busca = $busca->where('preco', '>=', $preco_minimo);
+        }elseif (!is_null($preco_maximo)) {
+            $busca = $busca->where('preco', '<=', $preco_maximo);
+        }
+        
+        if (!is_null($peso_minimo) && !is_null($peso_maximo)) {
+            $busca = $busca->whereBetween('peso', [$peso_minimo, $peso_maximo]);
+        }elseif (!is_null($peso_minimo)) {
+            $busca = $busca->where('peso', '>=', $peso_minimo);
+        }elseif (!is_null($peso_maximo)) {
+            $busca = $busca->where('peso', '<=', $peso_maximo);
+        }
+
+        return view('produto.consultar', [
+            'produtos' => $busca->get(),
+            'categorias' => Categoria::all(),
+        ]);
     }
 
     /**
