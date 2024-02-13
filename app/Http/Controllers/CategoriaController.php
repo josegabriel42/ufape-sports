@@ -54,4 +54,15 @@ class CategoriaController extends Controller
 
         return redirect('/cadastroCategoria');
     }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Categoria  $categoria
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Categoria $categoria)
+    {
+        return $categoria;
+    }
 }
