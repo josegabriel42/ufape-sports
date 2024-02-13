@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoriaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,3 +21,6 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/cadastroCategoria', [CategoriaController::class, 'create']);
+Route::post('/cadastroCategoria', [CategoriaController::class, 'store'])->name('cadastroCategoria');
