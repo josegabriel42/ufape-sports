@@ -53,29 +53,46 @@
                             @endif
                         @else
                             @if(Auth::user()->email == 'adm@adm')
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('telaCadastroCategoria') }}">
-                                        {{ __('Cadastro categoria') }}
+                                <li class="nav-item dropdown">
+                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        PROMOÇÕES
                                     </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('telaCadastroProduto') }}">
-                                        {{ __('Cadastro produto') }}
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('telaCadastroPromocao') }}">
-                                        {{ __('Cadastro promoção') }}
-                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="{{ route('telaCadastroPromocao') }}">
+                                            {{ __('Cadastrar') }}
+                                        </a>
+                                    </div>
                                 </li>
                             @endif
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('produtos') }}">
-                                        {{ __('Buscar produtos') }}
+
+                            @if(Auth::user()->email == 'adm@adm')
+                                <li class="nav-item dropdown">
+                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        CATEGORIAS
                                     </a>
+                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="{{ route('telaCadastroCategoria') }}">
+                                            {{ __('Cadastrar') }}
+                                        </a>
+                                    </div>
                                 </li>
+                            @endif
+                            
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    PRODUTOS
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('produtos') }}">
+                                        {{ __('Buscar') }}
+                                    </a>
+                                    @if(Auth::user()->email == 'adm@adm')
+                                        <a class="dropdown-item" href="{{ route('telaCadastroProduto') }}">
+                                            {{ __('Cadastrar') }}
+                                        </a>
+                                    @endif
+                                </div>
+                            </li>
 
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

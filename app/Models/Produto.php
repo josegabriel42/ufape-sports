@@ -37,9 +37,9 @@ class Produto extends Model
     //     return $this->belongsToMany(Carrinho::class, 'item_carrinho')->withPivot('preco_total', 'qnt', 'preco_unitario');
     // }
 
-    // public function promocaos(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(Promocao::class, 'prodpromo')->withPivot('data');
-    // }
+    public function promocoes(): BelongsToMany
+    {
+        return $this->belongsToMany(Promocao::class, 'produto_promocao');
+    }
 
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use App\Models\Produto;
+use App\Models\Promocao;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -43,13 +45,17 @@ class ProdutoController extends Controller
         $nome = $request['nome'];
         $categoria = $request['categoria'];
         $marca = $request['marca'];
-        $cor = $request['cor'];
         $preco_minimo = $request['preco_minimo'];
         $preco_maximo = $request['preco_maximo'];
         $peso_minimo = $request['peso_minimo'];
         $peso_maximo = $request['peso_maximo'];
+        $promocao_id = $request['promocao_id'];
 
-        $busca = DB::table('produtos');
+        if(is_null($promocao_id)) {
+            $busca = DB::table('produtos');
+        }else {
+            $busca = Produto::doesntHave('promocoes');
+        }
 
         if ($nome)
             $busca = $busca->where('nome', 'like', '%'.$nome.'%');
@@ -76,10 +82,24 @@ class ProdutoController extends Controller
             $busca = $busca->where('peso', '<=', $peso_maximo);
         }
 
-        return view('produto.consultar', [
-            'produtos' => $busca->get(),
-            'categorias' => Categoria::all(),
-        ]);
+        if(is_null($promocao_id)) {
+            return view('produto.consultar', [
+                'produtos' => $busca->get(),
+                'categorias' => Categoria::all(),
+            ]);
+        } else {
+            $promocao = Promocao::find($promocao_id);
+            $produtos_promocao = $promocao->produtos()->get();
+            $produtos = $busca->get();
+
+            return view('produto.consultar', [
+                'promocao' => $promocao,
+                'produtos_promocao' => $produtos_promocao,
+                'produtos' => $produtos,
+                'categorias' => Categoria::all(),
+            ]);
+        }
+
     }
 
     /**
@@ -113,7 +133,7 @@ class ProdutoController extends Controller
         ]);
 
         if($validator->fails()) {
-            // dd($validator);
+            dd($validator);
             return redirect('/cadastroProduto')->withErrors($validator)->withInput();
         }
 

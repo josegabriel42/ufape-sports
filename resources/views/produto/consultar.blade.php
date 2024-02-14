@@ -16,6 +16,10 @@
                     <form method="GET" action="{{ route('consultaProdutos') }}">
                         @csrf
 
+                        @isset($promocao)
+                            <input type="text" id="promocao_id" name="promocao_id" value="{{ $promocao->id }}" hidden>
+                        @endisset
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="row">
@@ -101,12 +105,48 @@
                 </div>
             </div>
         </div>
-        
 
+        <!-- LISTAGEM DE PRODUTOS COM PROMOÇÃO -->
+        @isset($promocao)
+            <div class="col-md-12 mt-3">
+                <hr>
+                <h2>Com Promoção</h2>
+
+                <div class="row">
+                    @forelse($produtos_promocao as $produto_promocao)
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="text" class="form-control mb-2" value="Nome: {{ $produto_promocao->nome }}" disabled>
+                                    <input type="text" class="form-control mb-2" value="Marca: {{ $produto_promocao->marca }}" disabled>
+                                    <input type="text" class="form-control mb-2" value="Preco: R${{ $produto_promocao->preco }}" disabled>
+                                    <input type="text" class="form-control mb-2" value="Peso: {{ $produto_promocao->peso }}kg" disabled>
+                                    <input type="color" class="form-control form-control-color mb-2" value="{{ $produto_promocao->cor }}" disabled>
+                                    
+                                    <form method="POST" action="{{ route('aplicarOuRemoverPromocao') }}">
+                                        @method('PUT')
+                                        @csrf
+                                        <input type="text" id="promocao_id" name="promocao_id" value="{{ $promocao->id }}" hidden>
+                                        <input type="text" id="produto_id" name="produto_id" value="{{ $produto_promocao->id }}" hidden>
+
+                                        <button type="submit" class="btn btn-danger col-12">
+                                            {{ __('Remover promoção') }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <h3>Nenhum produto encontrado</h3>
+                    @endforelse
+                </div>
+            </div>
+        @endempty
+
+        <!-- LISTAGEM DE PRODUTOS SEM PROMOÇÃO -->
         <div class="col-md-12 mt-3">
             <hr>
-
-            <h2>Produtos</h2>
+            <h2>Sem Promoção</h2>
 
             <div class="row">
                 @forelse($produtos as $produto)
@@ -119,7 +159,7 @@
                                 <input type="text" class="form-control mb-2" value="Peso: {{ $produto->peso }}kg" disabled>
                                 <input type="color" class="form-control form-control-color mb-2" value="{{ $produto->cor }}" disabled>
 
-                                @if(Auth::user()->email != 'adm@adm.com')
+                                @if(Auth::user()->email != 'adm@adm')
                                     <form method="POST" action="{{ route('adicionarAoCarrinho') }}">
                                         @method('PUT')
                                         @csrf
@@ -134,8 +174,20 @@
                                         @endif
                                     </form>
                                 @else
-                                    <a class="btn btn-info col-12" href="{{ route('visualizarProduto', ['produto' => $produto->id]) }}" role="button">{{ __('Visualizar') }}</a>
-                                    </form>
+                                    @empty($promocao)
+                                        <a class="btn btn-info col-12" href="{{ route('visualizarProduto', ['produto' => $produto->id]) }}" role="button">{{ __('Visualizar') }}</a>
+                                    @else
+                                        <form method="POST" action="{{ route('aplicarOuRemoverPromocao') }}">
+                                            @method('PUT')
+                                            @csrf
+                                            <input type="text" id="promocao_id" name="promocao_id" value="{{ $promocao->id }}" hidden>
+                                            <input type="text" id="produto_id" name="produto_id" value="{{ $produto->id }}" hidden>
+
+                                            <button type="submit" class="btn btn-success col-12">
+                                                {{ __('Aplicar promoção') }}
+                                            </button>
+                                        </form>
+                                    @endempty
                                 @endif
                             </div>
                         </div>
