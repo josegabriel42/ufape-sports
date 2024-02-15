@@ -39,6 +39,33 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
+        DB::table('enderecos')->insert([
+            [
+                'user_id' => '1',
+                'estado' => 'Ooo',
+                'cidade' => 'Cidadela',
+                'bairro' => 'Sei lá man',
+                'logradouro' => 'Rua 1 Número 1',
+                'cep' => '01',
+            ],
+            [
+                'user_id' => '2',
+                'estado' => 'Arkham',
+                'cidade' => 'Sem nome',
+                'bairro' => 'Sei lá man',
+                'logradouro' => 'Rua 42 Número 0',
+                'cep' => '69',
+            ],
+            [
+                'user_id' => '3',
+                'estado' => 'PE',
+                'cidade' => 'Garanhuns',
+                'bairro' => 'Sei lá man',
+                'logradouro' => '???',
+                'cep' => '5529????',
+            ],
+        ]);
+
         DB::table('compras')->insert([
             [
                 'user_id' => 2,

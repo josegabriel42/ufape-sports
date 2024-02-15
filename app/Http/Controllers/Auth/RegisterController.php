@@ -55,6 +55,12 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'confirmed'],
             'cpf' => ['required', 'string', 'regex:/^[0-9]+$/'],
             'telefone' => ['required', 'string', 'regex:/^[0-9]+$/'],
+
+            'estado' => ['required', 'string', 'max:255'],
+            'cidade' => ['required', 'string', 'max:255'],
+            'bairro' => ['required', 'string', 'max:255'],
+            'logradouro' => ['required', 'string', 'max:255'],
+            'cep' => ['required', 'string', 'regex:/^[0-9]+$/'],
         ]);
     }
 
@@ -73,6 +79,8 @@ class RegisterController extends Controller
             'cpf' => $data['cpf'],
             'telefone' => $data['telefone'],
         ]);
+
+        $user_created->enderecos()->create($data);
 
         $user_created->compras()->create([
             'concluida' => false,

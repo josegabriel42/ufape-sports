@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CompraController;
+use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\PromocaoController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Auth::routes();
+
+Route::get('/editar', [UserController::class, 'edit'])->name('edit');
+Route::put('/atualizar', [UserController::class, 'update'])->name('update');
 
 Route::get('/', [ProdutoController::class, 'index'])->name('home');
 
@@ -39,4 +44,5 @@ Route::put('/aplicarOuRemoverPromocao', [PromocaoController::class, 'aplicarOuRe
 
 Route::put('/adicionarAoCarrinho', [CompraController::class, 'adicionarAoCarrinho'])->name('adicionarAoCarrinho');
 Route::get('/carrinho', [CompraController::class, 'irParaCarrinho'])->name('irParaCarrinho');
-Route::get('/finalizarCompra', [CompraController::class, 'finalizarCompra'])->name('finalizarCompra');
+Route::get('/finalizarCompra', [PagamentoController::class, 'create'])->name('finalizarCompra');
+Route::post('/finalizarPagamento', [PagamentoController::class, 'store'])->name('finalizarPagamento');

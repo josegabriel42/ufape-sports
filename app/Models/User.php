@@ -49,4 +49,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Compra::class);
     }
+
+    public function enderecos(): HasMany
+    {
+        return $this->hasMany(Endereco::class);
+    }
 }

@@ -133,7 +133,6 @@ class ProdutoController extends Controller
         ]);
 
         if($validator->fails()) {
-            dd($validator);
             return redirect('/cadastroProduto')->withErrors($validator)->withInput();
         }
 

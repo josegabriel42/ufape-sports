@@ -163,15 +163,6 @@ class CompraController extends Controller
     }
 
     /**
-     * Exibe uma lista dos itens adicionaod ao carrinho
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function finalizarCompra() {
-        return view('pagamento.efetuarPagamento');
-    }
-
-    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response

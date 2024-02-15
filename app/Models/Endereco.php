@@ -6,20 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Pagamento extends Model
+class Endereco extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'nome_titular',
-        'data_vencimento_cartao',
-        'numero_cartao',
-        'endereco_entrega',
-        'total',
+        'estado',
+        'cidade',
+        'bairro',
+        'logradouro',
+        'cep',
     ];
 
-    public function compra(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Compra::class);
+        return $this->belongsTo(User::class);
     }
 }

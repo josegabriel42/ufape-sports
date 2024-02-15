@@ -85,8 +85,16 @@
                         </div>
 
                         <div class="row justify-content-end">
-                            <div class="col-md-3 mt-2">
-                                <a class="btn btn-success col-12" href="{{ route('finalizarCompra') }}" role="button">{{ __('Finalizar') }}</a>
+                            <div class="col-md-3 mt-1">
+                                <form method="GET" action="{{ route('finalizarCompra') }}">
+                                    @csrf
+                                    <input type="hidden" id="compra_id" name="compra_id" value="{{ $compra->id }}">
+                                    <input type="hidden" id="total" name="total" value="{{ $total_da_compra }}">
+                                    
+                                    <button type="submit" class="btn col-12 btn-success">
+                                    {{ __('Finalizar') }}
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     @endisset
