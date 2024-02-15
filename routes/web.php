@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\PromocaoController;
 use Illuminate\Http\Request;
@@ -36,6 +37,6 @@ Route::get('/cadastroPromocao', [PromocaoController::class, 'create'])->name('te
 Route::post('/cadastroPromocao', [PromocaoController::class, 'store'])->name('cadastroPromocao');
 Route::put('/aplicarOuRemoverPromocao', [PromocaoController::class, 'aplicarOuRemoverPromocao'])->name('aplicarOuRemoverPromocao');
 
-Route::put('/adicionarAoCarrinho', function(Request $request) {
-    return redirect()->back()->with('adicionado', true);
-})->name('adicionarAoCarrinho');
+Route::put('/adicionarAoCarrinho', [CompraController::class, 'adicionarAoCarrinho'])->name('adicionarAoCarrinho');
+Route::get('/carrinho', [CompraController::class, 'irParaCarrinho'])->name('irParaCarrinho');
+Route::get('/finalizarCompra', [CompraController::class, 'finalizarCompra'])->name('finalizarCompra');

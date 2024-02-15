@@ -32,10 +32,10 @@ class Produto extends Model
         return $this->belongsTo(Categoria::class);
     }
 
-    // public function carrinhos(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(Carrinho::class, 'item_carrinho')->withPivot('preco_total', 'qnt', 'preco_unitario');
-    // }
+    public function compras(): BelongsToMany
+    {
+        return $this->belongsToMany(Compra::class, 'item_compra')->withPivot('quantidade', 'preco_total', 'preco_com_desconto');
+    }
 
     public function promocoes(): BelongsToMany
     {

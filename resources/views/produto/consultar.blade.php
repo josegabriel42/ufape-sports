@@ -3,11 +3,22 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-    @if(session('adicionado'))
-        <div class="alert alert-primary alert-dismissible fade show" role="alert">
-            <strong>Produto adicionado ao carrinho</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    @if(session('mensagem_status_aviso'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>{{ session('mensagem_status_aviso') }}</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+    @if(session('mensagem_status'))
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            <strong>{{ session('mensagem_status') }}</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if(session('mensagem_status_erro'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{ session('mensagem_status_erro') }}</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">{{ __('Buscar Produtos') }}</div>
@@ -110,7 +121,7 @@
         @isset($promocao)
             <div class="col-md-12 mt-3">
                 <hr>
-                <h2>Com Promoção</h2>
+                <h2>Na Promoção</h2>
 
                 <div class="row">
                     @forelse($produtos_promocao as $produto_promocao)
@@ -146,7 +157,7 @@
         <!-- LISTAGEM DE PRODUTOS SEM PROMOÇÃO -->
         <div class="col-md-12 mt-3">
             <hr>
-            <h2>Sem Promoção</h2>
+            <h2>Produtos</h2>
 
             <div class="row">
                 @forelse($produtos as $produto)
@@ -164,8 +175,9 @@
                                         @method('PUT')
                                         @csrf
                                         <input type="text" id="produto_id" name="produto_id" value="{{ $produto->id }}" hidden>
-
+                                        
                                         @if($produto->estoque > 0)
+                                            <input type="number" class="form-control mb-2" min="1" step="1" id="quantidade" name="quantidade" value=1>
                                             <button type="submit" class="btn btn-secondary col-12">
                                                 {{ __('Adicionar ao carrinho') }}
                                             </button>
