@@ -10,7 +10,7 @@
     @endif
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Cadastrar Produto') }}</div>
+            <div class="card-header">@isset($produto) {{ __('Editar Produto') }} @else {{ __('Cadastrar Produto') }} @endisset</div>
 
                 <div class="card-body">
                     <form method="POST" action="@isset($produto) {{ route('atualizaProduto') }} @else {{ route('cadastroProduto') }} @endif">
@@ -27,7 +27,9 @@
                             <div class="col-md-6">
                                 <select id="categoria" class="form-select @error('categoria') is-invalid @enderror" aria-label="Default select example" name="categoria">
                                     @foreach($categorias as $categoria)
-                                        @if(isset($produto) && $produto->categoria_id == $categoria->id)
+                                        @if(old('categoria') == $categoria->id)
+                                            <option value="{{ $categoria->id }}" selected>{{ $categoria->nome }}</option>
+                                        @elseif(isset($produto) && $produto->categoria_id == $categoria->id)
                                             <option value="{{ $categoria->id }}" selected>{{ $categoria->nome }}</option>
                                         @else
                                             <option value="{{ $categoria->id }}">{{ $categoria->nome }}</option>
@@ -47,7 +49,7 @@
                             <label for="nome" class="col-md-4 col-form-label text-md-end">{{ __('Nome') }}</label>
 
                             <div class="col-md-6">
-                                <input id="nome" type="text" class="form-control @error('nome') is-invalid @enderror" name="nome" value="{{ $produto->nome ?? old('nome') }}" required autocomplete="nome" autofocus>
+                                <input id="nome" type="text" class="form-control @error('nome') is-invalid @enderror" name="nome" value="{{ $produto->nome ?? old('nome') ?? '' }}" required autocomplete="nome" autofocus>
 
                                 @error('nome')
                                     <span class="invalid-feedback" role="alert">
@@ -61,7 +63,7 @@
                             <label for="descricao" class="col-md-4 col-form-label text-md-end">{{ __('Descricao') }}</label>
 
                             <div class="col-md-6">
-                                <input id="descricao" type="text" class="form-control @error('descricao') is-invalid @enderror" name="descricao" value="{{ $produto->descricao ?? old('descricao') }}" required autocomplete="descricao" autofocus>
+                                <input id="descricao" type="text" class="form-control @error('descricao') is-invalid @enderror" name="descricao" value="{{ old('descricao') ?? $produto->descricao ?? '' }}" required autocomplete="descricao" autofocus>
 
                                 @error('descricao')
                                     <span class="invalid-feedback" role="alert">
@@ -75,7 +77,7 @@
                             <label for="marca" class="col-md-4 col-form-label text-md-end">{{ __('Marca') }}</label>
 
                             <div class="col-md-6">
-                                <input id="marca" type="text" class="form-control @error('marca') is-invalid @enderror" name="marca" value="{{ $produto->marca ?? old('marca') }}" required autocomplete="marca" autofocus>
+                                <input id="marca" type="text" class="form-control @error('marca') is-invalid @enderror" name="marca" value="{{ old('marca') ?? $produto->marca ?? '' }}" required autocomplete="marca" autofocus>
 
                                 @error('marca')
                                     <span class="invalid-feedback" role="alert">
@@ -89,7 +91,7 @@
                             <label for="cor" class="col-md-4 col-form-label text-md-end">{{ __('Cor') }}</label>
 
                             <div class="col-md-6">
-                                <input id="cor" type="color" class="form-control form-control-color @error('cor') is-invalid @enderror" name="cor" value="{{ $produto->cor ?? old('cor') }}" required autocomplete="cor" autofocus>
+                                <input id="cor" type="color" class="form-control form-control-color @error('cor') is-invalid @enderror" name="cor" value="{{ old('cor') ?? $produto->cor ?? '' }}" required autocomplete="cor" autofocus>
 
                                 @error('cor')
                                     <span class="invalid-feedback" role="alert">
@@ -103,7 +105,7 @@
                             <label for="preco" class="col-md-4 col-form-label text-md-end">{{ __('Preço') }}</label>
 
                             <div class="col-md-6">
-                                <input id="preco" type="number" step="0.01" class="form-control @error('preco') is-invalid @enderror" name="preco" value="{{ $produto->preco ?? old('preco') }}" required autocomplete="preco" autofocus>
+                                <input id="preco" type="number" step="0.01" class="form-control @error('preco') is-invalid @enderror" name="preco" value="{{  old('preco') ?? $produto->preco ?? '' }}" required autocomplete="preco" autofocus>
 
                                 @error('preco')
                                     <span class="invalid-feedback" role="alert">
@@ -117,7 +119,7 @@
                             <label for="peso" class="col-md-4 col-form-label text-md-end">{{ __('Peso') }}</label>
 
                             <div class="col-md-6">
-                                <input id="peso" type="number" step="0.01" class="form-control @error('peso') is-invalid @enderror" name="peso" value="{{ $produto->peso ?? old('peso') }}" required autocomplete="peso" autofocus>
+                                <input id="peso" type="number" step="0.01" class="form-control @error('peso') is-invalid @enderror" name="peso" value="{{ old('peso') ?? $produto->peso ?? '' }}" required autocomplete="peso" autofocus>
 
                                 @error('peso')
                                     <span class="invalid-feedback" role="alert">
@@ -131,7 +133,7 @@
                             <label for="estoque" class="col-md-4 col-form-label text-md-end">{{ __('Estoque') }}</label>
 
                             <div class="col-md-6">
-                                <input id="estoque" type="number" class="form-control @error('estoque') is-invalid @enderror" name="estoque" value="{{ $produto->estoque ?? old('estoque') }}" required autocomplete="estoque" autofocus>
+                                <input id="estoque" type="number" class="form-control @error('estoque') is-invalid @enderror" name="estoque" value="{{ old('estoque') ?? $produto->estoque ?? '' }}" required autocomplete="estoque" autofocus>
 
                                 @error('estoque')
                                     <span class="invalid-feedback" role="alert">
@@ -143,13 +145,15 @@
 
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
                                 @isset($produto)
-                                    {{ __('Atualizar') }}
+                                    <button type="submit" class="btn btn-warning">
+                                        {{ __('Atualizar') }}
+                                    </button>
                                 @else
-                                    {{ __('Cadastrar') }}
+                                    <button type="submit" class="btn btn-success">
+                                        {{ __('Cadastrar') }}
+                                    </button>
                                 @endisset
-                                </button>
                             </div>
                         </div>
                     </form>

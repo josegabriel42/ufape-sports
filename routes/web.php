@@ -30,6 +30,8 @@ Route::get('/', [ProdutoController::class, 'index'])->name('home');
 Route::get('/categoria/{categoria}', [CategoriaController::class, 'show']);
 Route::get('/cadastroCategoria', [CategoriaController::class, 'create'])->name('telaCadastroCategoria');
 Route::post('/cadastroCategoria', [CategoriaController::class, 'store'])->name('cadastroCategoria');
+Route::get('/atualizaCategoria/{categoria}', [CategoriaController::class, 'edit'])->name('telaAtualizaCategoria');
+Route::put('/atualizaCategoria', [CategoriaController::class, 'update'])->name('atualizaCategoria');
 
 Route::get('/produtos', [ProdutoController::class, 'index'])->name('produtos');
 Route::get('/consultaProdutos/{nome?}/{categoria?}/{marca?}/{cor?}/{preco_minimo?}/{preco_maximo?}/{peso_minimo?}/{peso_maximo?}/{promocao_id?}', [ProdutoController::class, 'consulta'])->name('consultaProdutos');
@@ -43,6 +45,8 @@ Route::get('/promocao/{promocao}', [PromocaoController::class, 'show'])->name('v
 Route::get('/cadastroPromocao', [PromocaoController::class, 'create'])->name('telaCadastroPromocao');;
 Route::post('/cadastroPromocao', [PromocaoController::class, 'store'])->name('cadastroPromocao');
 Route::put('/aplicarOuRemoverPromocao', [PromocaoController::class, 'aplicarOuRemoverPromocao'])->name('aplicarOuRemoverPromocao');
+Route::get('/atualizaPromocao/{promocao}', [PromocaoController::class, 'edit'])->name('telaAtualizaPromocao');
+Route::put('/atualizaPromocao', [PromocaoController::class, 'update'])->name('atualizaPromocao');
 
 Route::put('/adicionarAoCarrinho', [CompraController::class, 'adicionarAoCarrinho'])->name('adicionarAoCarrinho');
 Route::get('/carrinho', [CompraController::class, 'irParaCarrinho'])->name('irParaCarrinho');

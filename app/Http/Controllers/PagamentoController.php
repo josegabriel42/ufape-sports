@@ -42,6 +42,10 @@ class PagamentoController extends Controller
      */
     public function create(Request $request)
     {
+        //Bloqueia o adm de acessar essa tela
+        if(Auth::user()->email =='adm@adm')
+            return redirect('/');
+        
         $compra = Compra::find($request['compra_id']);
         $pagamento = $compra->pagamento()->first();
 
@@ -66,6 +70,10 @@ class PagamentoController extends Controller
      */
     public function store(Request $request)
     {
+        //Bloqueia o adm de acessar essa tela
+        if(Auth::user()->email =='adm@adm')
+            return redirect('/');
+
         $compra = Compra::find($request['compra_id']);
         $pagamento = $compra->pagamento()->first();
         $itens_carrinho = [];

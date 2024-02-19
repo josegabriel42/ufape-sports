@@ -52,6 +52,10 @@ class CompraController extends Controller
      */
     public function adicionarAoCarrinho (Request $request)
     {
+        //Bloqueia o adm de acessar essa tela
+        if(Auth::user()->email =='adm@adm')
+            return redirect('/');
+        
         $produto = Produto::find($request['produto_id']);
         $estoque_ok = true;
         
@@ -160,6 +164,10 @@ class CompraController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function irParaCarrinho() {
+        //Bloqueia o adm de acessar essa tela
+        if(Auth::user()->email =='adm@adm')
+            return redirect('/');
+
         return view('compra.carrinho', $this->getDadosCarrinho());
     }
 

@@ -7,6 +7,7 @@ use App\Models\Produto;
 use App\Models\Promocao;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -109,6 +110,10 @@ class ProdutoController extends Controller
      */
     public function create()
     {
+        //Bloqueia o acesso à usuários sem privilégio
+        if(Auth::user()->email !='adm@adm')
+            return redirect('/');
+        
         return view('produto.cadastro', ['categorias' => Categoria::all()]);
     }
 
@@ -120,6 +125,10 @@ class ProdutoController extends Controller
      */
     public function store(Request $request)
     {
+        //Bloqueia o acesso à usuários sem privilégio
+        if(Auth::user()->email !='adm@adm')
+            return redirect('/');
+
         $data = $request->all();
         $validator =  Validator::make($data, [
             'nome' => ['required', 'string', 'max:255', 'unique:produtos'],
@@ -170,6 +179,10 @@ class ProdutoController extends Controller
      */
     public function edit(Produto $produto)
     {
+        //Bloqueia o acesso à usuários sem privilégio
+        if(Auth::user()->email !='adm@adm')
+            return redirect('/');
+        
         return view('produto.cadastro', [
             'produto' => $produto, 
             'categorias' => Categoria::all()
@@ -185,6 +198,10 @@ class ProdutoController extends Controller
      */
     public function update(Request $request)
     {
+        //Bloqueia o acesso à usuários sem privilégio
+        if(Auth::user()->email !='adm@adm')
+            return redirect('/');
+
         $produto = Produto::find($request['produto_id']);
         if($produto->nome == $request['nome']) {
             $request['nome'] = 'nao avaliar';

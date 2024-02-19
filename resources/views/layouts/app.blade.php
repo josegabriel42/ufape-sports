@@ -107,9 +107,11 @@
                                     {{ Auth::user()->name }}
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('edit') }}" >
-                                        {{ __('Editar') }}
-                                    </a>
+                                    @if(Auth::user()->email != 'adm@adm')
+                                        <a class="dropdown-item" href="{{ route('edit') }}" >
+                                            {{ __('Editar') }}
+                                        </a>
+                                    @endif
 
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
