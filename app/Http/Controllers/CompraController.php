@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Compra;
 use App\Models\CompraProduto;
 use App\Models\Produto;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,8 +39,14 @@ class CompraController extends Controller
         $promocoes = $produto->promocoes()->get();
         $preco_com_desconto = $produto->preco * $quantidade;
 
-        foreach($promocoes as $promocao)
-            $preco_com_desconto *= ((100 - $promocao->percentagem)/100);
+        foreach($promocoes as $promocao) {
+            $data_inicio = Carbon::create($promocao->data_inicio);
+            $data_fim = Carbon::create($promocao->data_fim);
+            $data_hoje = Carbon::today();
+            if($data_hoje->gte($data_inicio) && $data_hoje->lte($data_fim)){
+                $preco_com_desconto *= ((100 - $promocao->percentagem)/100);
+            }
+        }
 
         return $preco_com_desconto;
     }

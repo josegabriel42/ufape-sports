@@ -171,10 +171,12 @@ class PromocaoController extends Controller
 
         //Evita que tente validar a data de início caso não tenha mudado (necessário para evitar erro)
         if($promocao->data_inicio == $request['data_inicio']) {
-            $request['data_inicio'] = Carbon::now();
+            $request['data_inicio'] = Carbon::today();
 
             if($promocao->data_fim == $request['data_fim'])
-                $request['data_fim'] = Carbon::now();
+                $request['data_fim'] = Carbon::today();
+            else
+                $promocao['data_fim'] = $request['data_fim'];
         }else {
             $promocao['data_inicio'] = $request['data_inicio'];
             $promocao['data_fim'] = $request['data_fim'];
