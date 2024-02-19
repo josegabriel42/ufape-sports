@@ -90,6 +90,8 @@ class UserController extends Controller
 
         if($user->email == $request['email']){
             $request['email'] = 'nao@avaliar.com';
+        }else{
+            $user['email'] = $request['email'];
         }
 
         $validator = Validator::make($request->all(), [
@@ -107,7 +109,6 @@ class UserController extends Controller
         ]);
 
         $user['name'] = $request['name'];
-        $user['email'] = $request['email'];
         $user['cpf'] = $request['cpf'];
 
         $endereco['estado'] = $request['estado'];
@@ -128,7 +129,6 @@ class UserController extends Controller
         }
 
         $request['email'] = $user['email'];
-
         $user->save();
         $endereco->save();
 

@@ -170,7 +170,10 @@ class ProdutoController extends Controller
      */
     public function edit(Produto $produto)
     {
-        //
+        return view('produto.cadastro', [
+            'produto' => $produto, 
+            'categorias' => Categoria::all()
+        ]);
     }
 
     /**
@@ -180,9 +183,44 @@ class ProdutoController extends Controller
      * @param  \App\Models\Produto  $produto
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Produto $produto)
+    public function update(Request $request)
     {
-        //
+        $produto = Produto::find($request['produto_id']);
+        if($produto->nome == $request['nome']) {
+            $request['nome'] = 'nao avaliar';
+        }else {
+            $produto['nome'] = $request['nome'];
+        }
+
+        $data = $request->all();
+        $validator =  Validator::make($data, [
+            'nome' => ['required', 'string', 'max:255', 'unique:produtos'],
+            'descricao' => ['required', 'string', 'max:255'],
+            'marca' => ['required', 'string'],
+            'cor' => ['required', 'string'],
+            'preco' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'peso' => ['required', 'numeric', 'min:1', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'estoque' => ['required', 'numeric', 'integer', 'min:0'],
+            'categoria' => ['required', 'exists:categorias,id'],
+        ]);
+
+        $produto['descricao'] = $request['descricao'];
+        $produto['marca'] = $request['marca'];
+        $produto['cor'] = $request['cor'];
+        $produto['preco'] = $request['preco'];
+        $produto['peso'] = $request['peso'];
+        $produto['estoque'] = $request['estoque'];
+        $produto['categoria_id'] = $request['categoria'];
+
+        if($validator->fails()) {
+            $request['nome'] = $produto['nome'];    
+            return redirect('/atualizaProduto/' . $produto->id)->withErrors($validator)->withInput();
+        }
+
+        $request['nome'] = $produto['nome'];
+        $produto->save();
+
+        return redirect()->back()->with('mensagem_status', 'Dados atualizados');
     }
 
     /**

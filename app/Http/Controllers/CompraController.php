@@ -109,6 +109,7 @@ class CompraController extends Controller
         foreach($itens_carrinho as $item){
             $produto = Produto::find($item->produto_id);
             $item->preco_com_desconto = $this->getDescontoProdutoNoCarrinho($produto, $item->quantidade);
+            $item->preco_com_desconto = round((float) $item->preco_com_desconto, 2);
             $item->save();
         }
 

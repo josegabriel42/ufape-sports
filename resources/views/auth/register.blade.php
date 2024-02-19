@@ -166,7 +166,11 @@
 
                         <div class="row">
                             <button type="submit" class="btn btn-success">
+                            @isset($user)
+                                {{ __('Atualizar') }}
+                            @else
                                 {{ __('Cadastrar') }}
+                            @endisset
                             </button>
                         </div>
                     </form>

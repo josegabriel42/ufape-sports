@@ -187,7 +187,7 @@
                                     </form>
                                 @else
                                     @empty($promocao)
-                                        <a class="btn btn-info col-12" href="{{ route('visualizarProduto', ['produto' => $produto->id]) }}" role="button">{{ __('Visualizar') }}</a>
+                                        <a class="btn btn-info col-12" href="{{ route('telaAtualizaProduto', ['produto' => $produto->id]) }}" role="button">{{ __('Visualizar') }}</a>
                                     @else
                                         <form method="POST" action="{{ route('aplicarOuRemoverPromocao') }}">
                                             @method('PUT')

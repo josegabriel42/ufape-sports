@@ -36,6 +36,8 @@ Route::get('/consultaProdutos/{nome?}/{categoria?}/{marca?}/{cor?}/{preco_minimo
 Route::get('/produto/{produto}', [ProdutoController::class, 'show'])->name('visualizarProduto');
 Route::get('/cadastroProduto', [ProdutoController::class, 'create'])->name('telaCadastroProduto');
 Route::post('/cadastroProduto', [ProdutoController::class, 'store'])->name('cadastroProduto');
+Route::get('/atualizaProduto/{produto}', [ProdutoController::class, 'edit'])->name('telaAtualizaProduto');
+Route::put('/atualizaProduto', [ProdutoController::class, 'update'])->name('atualizaProduto');
 
 Route::get('/promocao/{promocao}', [PromocaoController::class, 'show'])->name('visualizarPromocao');
 Route::get('/cadastroPromocao', [PromocaoController::class, 'create'])->name('telaCadastroPromocao');;
