@@ -248,7 +248,7 @@ class DatabaseSeeder extends Seeder
                 'nome' => 'Aventura Gelada',
                 'descricao' => 'Equipe-se para o frio com ofertas quentes em equipamentos de esqui, snowboard e roupas de inverno.',
                 'data_inicio' => '22/02/2024',
-                'data_fim' => '24/02/2024',
+                'data_fim' => '31/12/2025',
                 'percentagem' => 40,
             ],
             
