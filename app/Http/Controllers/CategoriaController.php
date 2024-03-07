@@ -61,7 +61,7 @@ class CategoriaController extends Controller
             'descricao' => $data['descricao'],
         ]);
 
-        return redirect('/cadastroCategoria');
+        return redirect('/cadastroCategoria')->with('mensagem_status', 'Categoria cadastrada');
     }
 
     /* Show the form for editing the specified resource.

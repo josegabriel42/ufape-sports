@@ -50,16 +50,20 @@ class PagamentoController extends Controller
         $pagamento = $compra->pagamento()->first();
 
         if(!$pagamento) {
-            $pagamento = $compra->pagamento()->create([
+            $pagamento = $compra->pagamento()->make([
                 'nome_titular' => "XXXXX",
                 'data_vencimento_cartao' => "XX/XX",
-                'numero_cartao' => 1,
+                'numero_cartao' => "00000000",
+                'cod_seguranca' => '000',
                 'endereco_entrega' => $this->getEnderecoUser(),
-                'total' => $request['total']
             ]);
         }
 
-        return view('pagamento.cadastrar', ['pagamento' => $pagamento, 'compra_id' => $compra->id]);
+        return view('pagamento.cadastrar', [
+            'pagamento' => $pagamento, 
+            'compra_id' => $compra->id,
+            'total' => $request['total'],
+        ]);
     }
 
     /**
@@ -75,19 +79,29 @@ class PagamentoController extends Controller
             return redirect('/');
 
         $compra = Compra::find($request['compra_id']);
-        $pagamento = $compra->pagamento()->first();
+        $pagamento = $compra->pagamento()->make([
+            'nome_titular' => "XXXXX",
+            'data_vencimento_cartao' => "XX/XX",
+            'numero_cartao' => "00000000",
+            'cod_seguranca' => '000',
+            'endereco_entrega' => $request['endereco_entrega'],
+        ]);;
         $itens_carrinho = [];
 
         $validator = Validator::make($request->all(), [
             'nome_titular' => ['required', 'string', 'max:256'],
             'data_vencimento_cartao' => ['required', 'string', 'max:255'],
-            'numero_cartao' => ['required', 'integer', 'min:0'],
+            'numero_cartao' => ['required', 'string', 'regex:/^[0-9]+$/'],
+            'cod_seguranca' => ['required', 'string', 'regex:/^[0-9]+$/', 'max:3'],
             // 'endereco_entrega' => ['required', 'string', 'regex:/^[0-9]+$/'],
-            // 'total' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,2})?$/']
         ]);
 
         if($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->with(['pagamento' => $pagamento, 'compra_id' => $compra->compra_id]);
+            return redirect()->back()->withErrors($validator)->withInput()->with([
+                'pagamento' => $pagamento, 
+                'compra_id' => $compra->compra_id,
+                'total' => $request['total'],
+            ]);
         }
 
         // Reduz os itens comprados do estoque
@@ -101,6 +115,7 @@ class PagamentoController extends Controller
         // Marca compra como concluída e cria um novo objeto compra para futuras operações
         $compra->concluida = true;
         $compra->data_compra = Carbon::now();
+        $compra->total = $request['total'];
         $compra->save();
         Auth::user()->compras()->create([
             'concluida' => false,
@@ -110,52 +125,8 @@ class PagamentoController extends Controller
         $pagamento->nome_titular = $request['nome_titular'];
         $pagamento->data_vencimento_cartao = $request['data_vencimento_cartao'];
         $pagamento->numero_cartao = $request['numero_cartao'];
+        $pagamento->save();
 
         return redirect('produtos')->with(['mensagem_status' => 'Pagamento efetuado!']);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Pagamento  $pagamento
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Pagamento $pagamento)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Pagamento  $pagamento
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Pagamento $pagamento)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Pagamento  $pagamento
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Pagamento $pagamento)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Pagamento  $pagamento
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Pagamento $pagamento)
-    {
-        //
     }
 }

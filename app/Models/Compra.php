@@ -19,6 +19,7 @@ class Compra extends Model
      */
     protected $fillable = [
         'concluida',
+        'total',
         'data_compra',
     ];
 

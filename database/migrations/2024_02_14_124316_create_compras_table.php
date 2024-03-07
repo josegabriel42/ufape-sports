@@ -18,6 +18,7 @@ class CreateComprasTable extends Migration
             $table->timestamps();
             $table->foreignId('user_id')->constrained();
             $table->date('data_compra')->nullable();
+            $table->double('total')->nullable();
             $table->boolean('concluida')->nullable();
         });
     }

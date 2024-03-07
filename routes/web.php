@@ -5,6 +5,7 @@ use App\Http\Controllers\CompraController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\PromocaoController;
+use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,10 @@ Route::put('/atualizar', [UserController::class, 'update'])->name('update');
 
 Route::get('/', [ProdutoController::class, 'index'])->name('home');
 
+Route::get('/historicoCompras', [CompraController::class, 'historico'])->name('telaHistoricoCompras');
+Route::get('/visualizarCompra/{compra}', [CompraController::class, 'show'])->name('visualizarCompra');
+Route::get('/relatorio', [RelatorioController::class, 'relatorio'])->name('telaRelatorio');
+
 Route::get('/categoria/{categoria}', [CategoriaController::class, 'show']);
 Route::get('/cadastroCategoria', [CategoriaController::class, 'create'])->name('telaCadastroCategoria');
 Route::post('/cadastroCategoria', [CategoriaController::class, 'store'])->name('cadastroCategoria');
@@ -42,7 +47,7 @@ Route::get('/atualizaProduto/{produto}', [ProdutoController::class, 'edit'])->na
 Route::put('/atualizaProduto', [ProdutoController::class, 'update'])->name('atualizaProduto');
 
 Route::get('/promocao/{promocao}', [PromocaoController::class, 'show'])->name('visualizarPromocao');
-Route::get('/cadastroPromocao', [PromocaoController::class, 'create'])->name('telaCadastroPromocao');;
+Route::get('/cadastroPromocao', [PromocaoController::class, 'create'])->name('telaCadastroPromocao');
 Route::post('/cadastroPromocao', [PromocaoController::class, 'store'])->name('cadastroPromocao');
 Route::put('/aplicarOuRemoverPromocao', [PromocaoController::class, 'aplicarOuRemoverPromocao'])->name('aplicarOuRemoverPromocao');
 Route::get('/atualizaPromocao/{promocao}', [PromocaoController::class, 'edit'])->name('telaAtualizaPromocao');

@@ -21,7 +21,7 @@
 
     <div class="col-md-10">
             <div class="card">
-                <div class="card-header"><h3>{{ __('Carrinho') }}</h3></div>
+                <div class="card-header"><h5 class="card-title">{{ __('Carrinho') }}</h5></div>
 
                 <div class="card-body">
                     <div class="row justify-content-center">

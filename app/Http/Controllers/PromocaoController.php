@@ -70,7 +70,32 @@ class PromocaoController extends Controller
             'percentagem' => $data['percentagem'],
         ]);
 
-        return view('promocao.cadastro', ['promocoes' => Promocao::all()]);
+        return redirect('/cadastroPromocao')->with('mensagem_status', 'Categoria cadastrada');
+    }
+
+    /**
+     * Retorna um objeto produto com dados adicionais referentes as suas promoções
+     * 
+     * @param Produto $produto
+     * @return Produto
+     */
+    private function getDadosPromocionaisProduto(Produto $produto) {
+        $promocoes = $produto->promocoes()->get();
+        $preco_com_desconto = $produto->preco;
+
+        foreach($promocoes as $promocao) {
+            $data_inicio = Carbon::create($promocao->data_inicio);
+            $data_fim = Carbon::create($promocao->data_fim);
+            $data_hoje = Carbon::today();
+            if($data_hoje->gte($data_inicio) && $data_hoje->lte($data_fim)) {
+                $preco_com_desconto *= ((100 - $promocao->percentagem)/100);
+                $produto['promocao_ativa'] = true;
+            }
+        }
+
+        $produto['preco_com_desconto'] = $preco_com_desconto;
+
+        return $produto;
     }
 
     /**
@@ -85,10 +110,21 @@ class PromocaoController extends Controller
         $produtos_promocao = $promocao->produtos()->get();
         $produtos = Produto::all()->diff($produtos_promocao);
 
+        $tmp = collect();
+        foreach($produtos_promocao as $produto)
+            $tmp->push($this->getDadosPromocionaisProduto($produto));
+        $produtos_promocao = $tmp;
+
+        $tmp = collect();
+        foreach($produtos as $produto)
+            $tmp->push($this->getDadosPromocionaisProduto($produto));
+        $produtos = $tmp;
+
         $dados = [
             'promocao' => $promocao,
             'produtos_promocao' => $produtos_promocao,
             'produtos' => $produtos,
+            'promocoes' => Promocao::all(),
             'categorias' => Categoria::all(),
         ];
 
@@ -127,7 +163,7 @@ class PromocaoController extends Controller
             $promocao->produtos()->attach($request['produto_id']);
         }
 
-        return view('produto.consultar', $this->getDadosParaTelaDeConsulta($promocao));
+        return redirect()->back()->withInput()->with($this->getDadosParaTelaDeConsulta($promocao));
     }
 
     /**

@@ -3,14 +3,14 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-    @if(session('mensagem_status'))
-        <div class="alert alert-primary alert-dismissible fade show" role="alert">
-            <strong>{{ session('mensagem_status') }}</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+        @if(session('mensagem_status'))
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <strong>{{ session('mensagem_status') }}</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <div class="col-md-8">
             <div class="card">
-            <div class="card-header">@isset($produto) {{ __('Editar Produto') }} @else {{ __('Cadastrar Produto') }} @endisset</div>
+            <div class="card-header"><h5 class="card-title">@isset($produto) {{ __('Editar Produto') }} @else {{ __('Cadastrar Produto') }} @endisset</h5></div>
 
                 <div class="card-body">
                     <form method="POST" action="@isset($produto) {{ route('atualizaProduto') }} @else {{ route('cadastroProduto') }} @endif">
@@ -144,17 +144,21 @@
                         </div>
 
                         <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                @isset($produto)
-                                    <button type="submit" class="btn btn-warning">
-                                        {{ __('Atualizar') }}
-                                    </button>
-                                @else
-                                    <button type="submit" class="btn btn-success">
-                                        {{ __('Cadastrar') }}
-                                    </button>
-                                @endisset
-                            </div>
+                            @isset($produto)
+                                <button type="submit" class="btn btn-success col-md-12">
+                                    {{ __('Atualizar') }}
+                                </button>
+                                <a class="btn btn-danger col-md-12 mt-1" href="{{ route('home') }}">
+                                    {{ __('Voltar') }}
+                                </a>
+                            @else
+                                <button type="submit" class="btn btn-success col-md-12">
+                                    {{ __('Cadastrar') }}
+                                </button>
+                                <a class="btn btn-danger col-md-12 mt-1" href="{{ route('home') }}">
+                                    {{ __('Voltar') }}
+                                </a>
+                            @endisset
                         </div>
                     </form>
                 </div>

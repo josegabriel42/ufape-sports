@@ -10,7 +10,7 @@
     @endif
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Cadastrar-se') }}</div>
+                <div class="card-header"><h5 class="card-title">@isset($user) {{ __('Editar Informações') }} @else {{ __('Cadastrar') }} @endisset</h5></div>
 
                 <div class="card-body">
                     <form method="POST" action="@isset($user) {{ route('update') }} @else {{ route('register') }} @endisset">
@@ -166,13 +166,19 @@
 
                         <div class="row">
                             @isset($user)
-                                <button type="submit" class="btn btn-warning">
+                                <button type="submit" class="btn btn-success">
                                     {{ __('Atualizar') }}
                                 </button>
+                                <a class="btn btn-danger col-md-12 mt-1" href="{{ route('home') }}">
+                                    {{ __('Voltar') }}
+                                </a>
                             @else
                                 <button type="submit" class="btn btn-success">
                                     {{ __('Cadastrar') }}
                                 </button>
+                                <a class="btn btn-danger col-md-12 mt-1" href="{{ route('login') }}">
+                                    {{ __('Voltar') }}
+                                </a>
                             @endisset
                         </div>
                     </form>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Categoria;
 use App\Models\Produto;
 use App\Models\Promocao;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,14 +25,44 @@ class ProdutoController extends Controller
     }
 
     /**
+     * Retorna um objeto produto com dados adicionais referentes as suas promoções
+     * 
+     * @param Produto $produto
+     * @return Produto
+     */
+    private function getDadosPromocionaisProduto(Produto $produto) {
+        $promocoes = $produto->promocoes()->get();
+        $preco_com_desconto = $produto->preco;
+
+        foreach($promocoes as $promocao) {
+            $data_inicio = Carbon::create($promocao->data_inicio);
+            $data_fim = Carbon::create($promocao->data_fim);
+            $data_hoje = Carbon::today();
+            if($data_hoje->gte($data_inicio) && $data_hoje->lte($data_fim)) {
+                $preco_com_desconto *= ((100 - $promocao->percentagem)/100);
+                $produto['promocao_ativa'] = true;
+            }
+        }
+
+        $produto['preco_com_desconto'] = $preco_com_desconto;
+
+        return $produto;
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
+        $produtos = collect();
+        foreach(Produto::all() as $produto)
+            $produtos->push($this->getDadosPromocionaisProduto($produto));
+
         return view('produto.consultar', [
-            'produtos' => Produto::all(),
+            'produtos' => $produtos,
+            'promocoes' => Promocao::all(),
             'categorias' => Categoria::all(),
         ]);
     }
@@ -45,6 +76,7 @@ class ProdutoController extends Controller
     {
         $nome = $request['nome'];
         $categoria = $request['categoria'];
+        $promocao = $request['promocao'];
         $marca = $request['marca'];
         $preco_minimo = $request['preco_minimo'];
         $preco_maximo = $request['preco_maximo'];
@@ -53,9 +85,11 @@ class ProdutoController extends Controller
         $promocao_id = $request['promocao_id'];
 
         if(is_null($promocao_id)) {
-            $busca = DB::table('produtos');
+            $busca = Produto::where('id', '>', 0);
         }else {
-            $busca = Produto::doesntHave('promocoes');
+            $busca = Produto::whereDoesntHave('promocoes', function (Builder $query) use ($promocao_id) {
+                $query->where('promocao_id', $promocao_id);
+            });
         }
 
         if ($nome)
@@ -63,9 +97,15 @@ class ProdutoController extends Controller
         
         if ($categoria)
             $busca = $busca->where('categoria_id', $categoria);
+
+        if ($promocao) {
+            $busca = $busca->whereHas('promocoes', function (Builder $query) use ($promocao) {
+                $query->where('promocao_id', $promocao)->where('data_fim', '>=', Carbon::today());
+            });
+        }
         
         if ($marca)
-            $busca = $busca->where('nome', 'like', '%'.$marca.'%');
+            $busca = $busca->where('marca', 'like', '%'.$marca.'%');
 
         if (!is_null($preco_minimo) && !is_null($preco_maximo)) {
             $busca = $busca->whereBetween('preco', [$preco_minimo, $preco_maximo]);
@@ -83,20 +123,27 @@ class ProdutoController extends Controller
             $busca = $busca->where('peso', '<=', $peso_maximo);
         }
 
+        $produtos = collect();
+        foreach($busca->get() as $produto)
+            $produtos->push($this->getDadosPromocionaisProduto($produto));
+
         if(is_null($promocao_id)) {
             return view('produto.consultar', [
-                'produtos' => $busca->get(),
+                'produtos' => $produtos,
+                'promocoes' => Promocao::all(),
                 'categorias' => Categoria::all(),
             ]);
         } else {
             $promocao = Promocao::find($promocao_id);
-            $produtos_promocao = $promocao->produtos()->get();
-            $produtos = $busca->get();
+            $produtos_promocao = collect();
+            foreach($promocao->produtos()->get() as $produto)
+                $produtos_promocao->push($this->getDadosPromocionaisProduto($produto));
 
             return view('produto.consultar', [
                 'promocao' => $promocao,
                 'produtos_promocao' => $produtos_promocao,
                 'produtos' => $produtos,
+                'promocoes' => Promocao::all(),
                 'categorias' => Categoria::all(),
             ]);
         }
@@ -136,7 +183,7 @@ class ProdutoController extends Controller
             'marca' => ['required', 'string'],
             'cor' => ['required', 'string'],
             'preco' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'peso' => ['required', 'numeric', 'min:1', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'peso' => ['required', 'numeric', 'min:0.01', 'regex:/^\d+(\.\d{1,2})?$/'],
             'estoque' => ['required', 'numeric', 'integer', 'min:0'],
             'categoria' => ['required', 'exists:categorias,id'],
         ]);
@@ -157,7 +204,7 @@ class ProdutoController extends Controller
             'categoria_id' => $data['categoria'],
         ]);
 
-        return redirect('/cadastroProduto');
+        return redirect('/cadastroProduto')->with('mensagem_status', 'Produto cadastrado');
     }
 
     /**
@@ -168,7 +215,35 @@ class ProdutoController extends Controller
      */
     public function show(Produto $produto)
     {
-        return $produto;
+        $categoria = $produto->categoria()->first();
+        $promocoes = $produto->promocoes()->get();
+        $promocoes_valendo = collect();
+        $produtos_mesma_categoria = Produto::where('categoria_id', $categoria->id)->get();
+        $preco_com_desconto = $produto->preco;
+
+        foreach($promocoes as $promocao) {
+            $data_inicio = Carbon::create($promocao->data_inicio);
+            $data_fim = Carbon::create($promocao->data_fim);
+            $data_hoje = Carbon::today();
+            if($data_hoje->gte($data_inicio) && $data_hoje->lte($data_fim)) {
+                $promocoes_valendo->push($promocao);
+                $preco_com_desconto *= ((100 - $promocao->percentagem)/100);
+            }
+        }
+
+        $produto['preco_com_desconto'] = $preco_com_desconto;
+
+        $tmp = collect();
+        foreach($produtos_mesma_categoria as $produto_m_c)
+            $tmp->push($this->getDadosPromocionaisProduto($produto_m_c));
+        $produtos_mesma_categoria = $tmp;
+
+        return view('produto.visualizar', [
+            'produto_atual' => $produto,
+            'nome_categoria' => $categoria->nome,
+            'produtos_mesma_categoria' => $produtos_mesma_categoria,
+            'promocoes_valendo' => $promocoes_valendo,
+        ]);
     }
 
     /**
@@ -216,7 +291,7 @@ class ProdutoController extends Controller
             'marca' => ['required', 'string'],
             'cor' => ['required', 'string'],
             'preco' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'peso' => ['required', 'numeric', 'min:1', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'peso' => ['required', 'numeric', 'min:0.01', 'regex:/^\d+(\.\d{1,2})?$/'],
             'estoque' => ['required', 'numeric', 'integer', 'min:0'],
             'categoria' => ['required', 'exists:categorias,id'],
         ]);
@@ -238,16 +313,5 @@ class ProdutoController extends Controller
         $produto->save();
 
         return redirect()->back()->with('mensagem_status', 'Dados atualizados');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Produto  $produto
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Produto $produto)
-    {
-        //
     }
 }

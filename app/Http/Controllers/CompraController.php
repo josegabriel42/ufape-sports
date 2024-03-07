@@ -6,8 +6,10 @@ use App\Models\Compra;
 use App\Models\CompraProduto;
 use App\Models\Produto;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CompraController extends Controller
 {
@@ -28,11 +30,76 @@ class CompraController extends Controller
     }
 
     /**
+     * Retorna as compras efetuadas pelo usuário na data específica
+     * 
+     * 
+     */
+    private function getDadosClienteCompra($compras) {
+        $tmp = collect();
+        foreach($compras as $compra) {
+            $compra['cpf_cliente'] = $this->maskCpf($compra->user()->first()->cpf);
+            $tmp->push($compra);
+        }
+        return $tmp;
+    }
+
+    /**
+     * Retorna as compras efetuadas pelo usuário na data específica
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function historico(Request $request) {
+        if(Auth::user()->email =='adm@adm') {
+            // Filtra por cpf
+            $cpf = $request['cpf'];
+            if(!is_null($cpf)) {
+                $compras = Compra::whereHas('user', function (Builder $query) use ($cpf) {
+                    $query->where('cpf', 'like', '%'.$cpf.'%');
+                })->where('concluida', true);
+            }else {
+                $compras = Compra::where('concluida', true);
+            }
+        }
+        else
+            $compras = Auth::user()->compras()->where('concluida', true);
+
+        // Filtra pela data
+        if(!is_null($request['data_inicio'])) {
+            if(!is_null($request['data_fim']))
+                $compras = $compras->whereBetween('data_compra', [$request['data_inicio'], $request['data_fim']]);
+            else
+                $compras = $compras->where('data_compra', '>=', $request['data_inicio']);
+        } else {
+            if(!is_null($request['data_fim']))
+                $compras = $compras->where('data_compra', '<=', $request['data_fim']);
+        }
+
+        // Filtra pelo total
+        if(!is_null($request['preco_minimo'])) {
+            if(!is_null($request['preco_maximo']))
+                $compras = $compras->whereBetween('total', [$request['preco_minimo'], $request['preco_maximo']]);
+            else
+                $compras = $compras->where('total', '>=', $request['preco_minimo']);
+        } else {
+            if(!is_null($request['preco_maximo']))
+                $compras = $compras->where('total', '<=', $request['preco_maximo']);
+        }
+        
+        $compras = $compras->get();
+
+        // Adiciona um versão censurado do cpf de cliente as info da compra
+        if(Auth::user()->email =='adm@adm')
+            $compras = $this->getDadosClienteCompra($compras);
+
+        return view('compra.historico', ['compras' => $compras]);
+    }
+
+    /**
      * Faz o calculo do desconto que um produto receberá com base nas
      * promoções à ele associadas
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
     private function getDescontoProdutoNoCarrinho(Produto $produto, $quantidade)
     {
@@ -69,7 +136,6 @@ class CompraController extends Controller
         if($request['quantidade'] < 0) {
             return redirect()->back()->with('mensagem_status_erro', 'Quantidade inválida do produto.');
         }else if ($request['quantidade'] > $produto->estoque) {
-            // return redirect()->back()->with('mensagem_status_aviso', 'Quantidade selecionada excede o estoque. Quantidade máxima disponível adicionada ao carrinho');
             $request['quantidade'] = $produto->estoque;
             $estoque_ok = false;
         }
@@ -158,6 +224,11 @@ class CompraController extends Controller
             $total_da_compra += $item->preco_com_desconto;
         }
 
+        
+        // Só salva o preço após fazer a verificação das promoções
+        $compra->total = $total_da_compra;
+        $compra->save();
+
         return [
             'compra' => $compra, 
             'itens_carrinho' => $itens_carrinho,
@@ -179,34 +250,17 @@ class CompraController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Censura o cpf fornecido
+     * 
+     * @param string $cpf
+     * @return string
      */
-    public function index()
-    {
-        //
-    }
+    private function maskCpf($cpf) {
+            $cpf_length = Str::length($cpf);
+            for($i = 0; $i < $cpf_length/2; $i++)
+                $cpf[$i] = '*';
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+            return $cpf;
     }
 
     /**
@@ -217,40 +271,23 @@ class CompraController extends Controller
      */
     public function show(Compra $compra)
     {
-        //
-    }
+        $itens_carrinho = collect();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Compra  $compra
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Compra $compra)
-    {
-        //
-    }
+        foreach($compra->produtos()->get() as $produto){
+            $item = $produto->pivot;
+            $item['nome'] = $produto->nome;
+            $item['preco_venda'] = ($item->preco_total/$item->quantidade);
+            $item['preco_atual'] = $produto->preco;
+            $itens_carrinho->push($produto->pivot);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Compra  $compra
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Compra $compra)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Compra  $compra
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Compra $compra)
-    {
-        //
+        if(Auth::user()->email =='adm@adm') 
+            $compra['cpf_cliente'] = $this->maskCpf($compra->user()->first()->cpf);
+            
+        return view('compra.visualizar', [
+            'compra' => $compra,
+            'pagamento' => $compra->pagamento()->first(),
+            'itens_carrinho' => $itens_carrinho,
+        ]);
     }
 }

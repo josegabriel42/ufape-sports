@@ -52,7 +52,7 @@
                         </div> -->
 
                         <div class="row mb-0 justify-content-center">
-                            <div class="col-md-4">
+                            <div class="col-md-12">
                                 <button type="submit" class="col-md-12 btn btn-primary">
                                     {{ __('Entrar') }}
                                 </button>
@@ -65,6 +65,14 @@
                             </div>
                         </div>
                     </form>
+
+                    <div class="row">
+                        <div class="col-md-12 mt-1">
+                            <a class="btn btn-secondary col-md-12" href="{{ route('register') }}">
+                                {{ __('Cadastrar-se') }}
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

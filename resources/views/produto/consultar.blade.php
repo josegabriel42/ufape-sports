@@ -21,7 +21,7 @@
 
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Buscar Produtos') }}</div>
+                <div class="card-header"><h5 class="card-title">{{ __('Buscar Produtos') }}</h5></div>
 
                 <div class="card-body">
                     <form method="GET" action="{{ route('consultaProdutos') }}">
@@ -48,6 +48,7 @@
 
                                     <div class="col-md-8">
                                         <select id="categoria" class="form-select" aria-label="Default select example" name="categoria">
+                                            <option value="0" selected>Todos</option>
                                             @foreach($categorias as $categoria)
                                                 <option value="{{ $categoria->id }}">{{ $categoria->nome }}</option>
                                             @endforeach
@@ -58,10 +59,29 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="marca" class="col-md-2 col-form-label">{{ __('Marca') }}</label>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <label for="marca" class="col-md-4 col-form-label">{{ __('Marca') }}</label>
+    
+                                    <div class="col-md-8">
+                                        <input id="marca" type="text" class="form-control" name="marca" value="{{ old('marca') }}" autocomplete="marca">
+                                    </div>
+                                </div>
+                            </div>
 
-                            <div class="col-md-10">
-                                <input id="marca" type="text" class="form-control" name="marca" value="{{ old('marca') }}" autocomplete="marca">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <label for="promocao" class="col-md-4 col-form-label">{{ __('Promoções') }}</label>
+
+                                    <div class="col-md-8">
+                                        <select id="promocao" class="form-select" aria-label="Default select example" name="promocao">
+                                            <option value="0" selected>Todos</option>
+                                            @foreach($promocoes as $promo)
+                                                <option value="{{ $promo->id }}">{{ $promo->nome }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -106,11 +126,9 @@
                         </div>
 
                         <div class="row mb-0">
-                            <div class="col-md-6">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Buscar') }}
-                                </button>
-                            </div>
+                            <button type="submit" class="btn btn-primary col-md-12">
+                                {{ __('Buscar') }}
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -125,12 +143,13 @@
 
                 <div class="row">
                     @forelse($produtos_promocao as $produto_promocao)
-                        <div class="col-md-3">
-                            <div class="card">
+                        <div class="col-md-3 mb-3">
+                            <div class="card" style="@if($produto_promocao['promocao_ativa']) background-color:yellow; @endif">
                                 <div class="card-body">
                                     <input type="text" class="form-control mb-2" value="Nome: {{ $produto_promocao->nome }}" disabled>
                                     <input type="text" class="form-control mb-2" value="Marca: {{ $produto_promocao->marca }}" disabled>
                                     <input type="text" class="form-control mb-2" value="Preco: R${{ $produto_promocao->preco }}" disabled>
+                                    <input type="text" class="form-control mb-2" value="Preco com desconto: R${{ $produto_promocao->preco_com_desconto }}" disabled>
                                     <input type="text" class="form-control mb-2" value="Peso: {{ $produto_promocao->peso }}kg" disabled>
                                     <input type="color" class="form-control form-control-color mb-2" value="{{ $produto_promocao->cor }}" disabled>
                                     
@@ -144,6 +163,7 @@
                                             {{ __('Remover promoção') }}
                                         </button>
                                     </form>
+                                    <a class="btn btn-info col-12 my-2" href="{{ route('visualizarProduto', ['produto' => $produto_promocao->id]) }}" role="button">{{ __('Visualizar') }}</a>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +172,7 @@
                     @endforelse
                 </div>
             </div>
-        @endempty
+        @endisset
 
         <!-- LISTAGEM DE PRODUTOS SEM PROMOÇÃO -->
         <div class="col-md-12 mt-3">
@@ -161,12 +181,13 @@
 
             <div class="row">
                 @forelse($produtos as $produto)
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-3">
                         <div class="card">
-                            <div class="card-body">
+                            <div class="card-body" style="@if($produto['promocao_ativa']) background-color:yellow; @endif">
                                 <input type="text" class="form-control mb-2" value="Nome: {{ $produto->nome }}" disabled>
                                 <input type="text" class="form-control mb-2" value="Marca: {{ $produto->marca }}" disabled>
                                 <input type="text" class="form-control mb-2" value="Preco: R${{ $produto->preco }}" disabled>
+                                <input type="text" class="form-control mb-2" value="Promoção: R${{ $produto->preco_com_desconto }}" disabled>
                                 <input type="text" class="form-control mb-2" value="Peso: {{ $produto->peso }}kg" disabled>
                                 <input type="color" class="form-control form-control-color mb-2" value="{{ $produto->cor }}" disabled>
 
@@ -201,6 +222,7 @@
                                         </form>
                                     @endempty
                                 @endif
+                                <a class="btn btn-info col-12 my-2" href="{{ route('visualizarProduto', ['produto' => $produto->id]) }}" role="button">{{ __('Visualizar') }}</a>
                             </div>
                         </div>
                     </div>

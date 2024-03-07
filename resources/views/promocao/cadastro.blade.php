@@ -3,14 +3,14 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-    @if(session('mensagem_status'))
-        <div class="alert alert-primary alert-dismissible fade show" role="alert">
-            <strong>{{ session('mensagem_status') }}</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+        @if(session('mensagem_status'))
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <strong>{{ session('mensagem_status') }}</strong> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <div class="col-md-8">
             <div class="card">
-            <div class="card-header">@isset($promocao) {{ __('Editar Promoção') }} @else {{ __('Cadastrar Promoção') }} @endisset</div>
+            <div class="card-header"><h5 class="card-title">@isset($promocao) {{ __('Editar Promoção') }} @else {{ __('Cadastrar Promoção') }} @endisset</h5></div>
 
                 <div class="card-body">
                     <form method="POST" action="@isset($promocao) {{ route('atualizaPromocao') }} @else {{ route('cadastroPromocao') }} @endisset">
@@ -101,17 +101,21 @@
                         </div>
 
                         <div class="row mb-0">
-                            <div class="col-md-6">
-                                @isset($promocao)
-                                    <button type="submit" class="btn btn-warning">
-                                        {{ __('Atualizar') }}
-                                    </button>
-                                @else
-                                    <button type="submit" class="btn btn-success">
-                                        {{ __('Cadastrar') }}
-                                    </button>
-                                @endisset
-                            </div>
+                            @isset($promocao)
+                                <button type="submit" class="btn btn-success col-md-12">
+                                    {{ __('Atualizar') }}
+                                </button>
+                                <a class="btn btn-danger col-md-12 mt-1" href="{{ route('cadastroPromocao') }}">
+                                    {{ __('Voltar') }}
+                                </a>
+                            @else
+                                <button type="submit" class="btn btn-success col-md-12">
+                                    {{ __('Cadastrar') }}
+                                </button>
+                                <a class="btn btn-danger col-md-12 mt-1" href="{{ route('home') }}">
+                                    {{ __('Voltar') }}
+                                </a>
+                            @endisset
                         </div>
                     </form>
                 </div>
@@ -125,7 +129,7 @@
 
             <div class="row">
                 @forelse($promocoes as $promocao)
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-3">
                         <div class="card">
                             <div class="card-body">
                                 <input type="text" class="form-control mb-2" value="Nome: {{ $promocao->nome }}" disabled>
